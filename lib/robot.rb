@@ -2,16 +2,12 @@ class Robot
   attr_reader :position
   attr_reader :orientation
 
-  COMPASS = %w{north east south west}.freeze
-
   def initialize(table)
     @table = table
   end
 
   def place(x, y, orientation)
-    orientation = orientation.to_s.downcase
-    raise "Orientation #{orientation} is not valid" unless COMPASS.include?(orientation)
-    @orientation = orientation
+    @orientation = Orientation.new(orientation)
     @position = @table.position(x, y)
   end
 
@@ -29,15 +25,14 @@ class Robot
   end
 
   def report
-    return "Currently at #{position.x},#{position.y} Facing #{orientation.upcase}" if in_position?
+    return "Currently at #{position.x},#{position.y} Facing #{orientation.to_s.upcase}" if in_position?
     ""
   end
 
   private
   def rotate(dir)
     check_in_position!
-    index = COMPASS.index(@orientation)
-    @orientation = COMPASS[(index + dir) % COMPASS.length]
+    @orientation = orientation.rotate(dir)
   end
 
   def check_in_position!

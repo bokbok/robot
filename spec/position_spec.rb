@@ -6,13 +6,15 @@ describe Position do
   let(:new_position) { Position.new(20, 20, table) }
 
   describe "#advance" do
-    {'north' => [2, 3], 'south' => [2, 1], 'east' => [3, 2], 'west' => [1, 2]}.each do |dir, new_coord|
+    {north: [2, 3], south: [2, 1], east: [3, 2], west: [1, 2]}.each do |dir, new_coord|
       describe "when advancing in a #{dir} direction" do
+
+        let(:orientation) { Orientation.new(dir) }
 
         it "should give the advanced position" do
           table.should_receive(:position).with(*new_coord).and_return(new_position)
 
-          position.advance(dir).should == new_position
+          position.advance(orientation).should == new_position
         end
       end
     end

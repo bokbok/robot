@@ -11,38 +11,23 @@ describe Robot do
   end
 
   describe "#place" do
-    describe "position" do
-      before :each do
-        table.should_receive(:position).with(1, 2).and_return(position)
-      end
-
-      it "should place itself at the desired position" do
-        robot.place(1, 2, 'north')
-        robot.position.should == position
-      end
+    before :each do
+      table.should_receive(:position).with(1, 2).and_return(position)
     end
 
-    describe "orientation" do
-      it "should not accept an invalid orientation" do
-        -> { robot.place(1, 2, 'blah') }.should raise_error("Orientation blah is not valid")
-      end
+    it "should place itself at the desired position" do
+      robot.place(1, 2, 'north')
+      robot.position.should == position
+    end
 
-      %w{north south east west}.each do |orientation|
-        it "should accept #{orientation}" do
-          robot.place(1, 2, orientation)
-          robot.orientation.should == orientation
-        end
+    it "should place itself in the desired orientation" do
+      robot.place(1, 2, 'north')
+      robot.orientation.to_s.should == 'north'
+    end
 
-        it "should accept #{orientation} as a symbol" do
-          robot.place(1, 2, orientation.to_sym)
-          robot.orientation.should == orientation
-        end
-
-        it "should accept #{orientation.upcase}" do
-          robot.place(1, 2, orientation.upcase)
-          robot.orientation.should == orientation
-        end
-      end
+    it "should use an orientation" do
+      robot.place(1, 2, 'north')
+      robot.orientation.should be_a(Orientation)
     end
   end
 
@@ -54,7 +39,7 @@ describe Robot do
 
           before :each do
             robot.place(1, 2, orientation)
-            position.stub(:advance).with(orientation).and_return(new_position)
+            position.stub(:advance).with(Orientation.new(orientation)).and_return(new_position)
           end
 
           it "should ask the position for the new position" do
@@ -74,7 +59,7 @@ describe Robot do
 
   describe "#left" do
     describe "when in position" do
-      {'north' => 'west', 'west' => 'south', 'south' => 'east', 'east' => 'north'}.each do |original, rotated|
+      {north: :west, west: :south, south: :east, east: :north}.each do |original, rotated|
         describe "when facing #{original}" do
           before :each do
             robot.place(1, 2, original)
@@ -83,7 +68,7 @@ describe Robot do
           it "should orient it self #{rotated}" do
             robot.left
 
-            robot.orientation.should == rotated
+            robot.orientation.to_s.should == rotated.to_s
           end
         end
       end
@@ -98,7 +83,7 @@ describe Robot do
 
   describe "#right" do
     describe "when in position" do
-      {'north' => 'east', 'east' => 'south', 'south' => 'west', 'west' => 'north'}.each do |original, rotated|
+      {north: :east, east: :south, south: :west, west: :north}.each do |original, rotated|
         describe "when facing #{original}" do
           before :each do
             robot.place(1, 2, original)
@@ -107,7 +92,7 @@ describe Robot do
           it "should orient it self #{rotated}" do
             robot.right
 
-            robot.orientation.should == rotated
+            robot.orientation.to_s.should == rotated.to_s
           end
         end
       end
